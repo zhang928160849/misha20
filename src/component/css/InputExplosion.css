@@ -1,0 +1,38 @@
+.explosion-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.icon {
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.inputs-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  max-width: 300px; /* 根据需要调整 */
+  max-height: 150px; /* 根据需要调整 */
+}
+
+.exploded-input {
+  opacity: 0;
+  animation: explode 0.5s forwards;
+}
+
+@keyframes explode {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
