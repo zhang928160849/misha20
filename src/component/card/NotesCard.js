@@ -1,55 +1,23 @@
-import { TextArea } from "@ui5/webcomponents-react";
+import { List, ListItemStandard, TextArea } from "@ui5/webcomponents-react";
 import "../css/Dialog.css";
 import { Card, CardHeader, Icon, Button } from "@ui5/webcomponents-react";
 import { useState, useEffect } from "react";
+import FunctionSpec from "./FunctionSpec";
 
 function NotesCard({ isSubmitted }) {
-  const [textArea, setTextArea] = useState("");
+  const [functionSpecPopover, setFunctionSpecPopover] = useState({
+    opener: "createSC",
+    open: false,
+  });
 
-  useEffect(() => {
-    fetch("http://localhost:8080/functionSpec")
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        console.log("response raw", response);
-        let jsonResponse = await response.json();
-        console.log("response", jsonResponse);
-        return jsonResponse;
-      })
-      .then((data) => {
-        setTextArea(data.functionSpec);
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the value!", error);
-      });
-  }, []);
-
-  let onSend = async function () {
-    console.log("发出的body是", JSON.stringify({ functionSpec: textArea }));
-    fetch("http://localhost:8080/functionSpec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ functionSpec: textArea }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(
-            `Network response was not ok: ${response.statusText}`
-          );
-        }
-        return response.json();
-      })
-      .then((data) => {
-        alert("Updated successfully!");
-      })
-      .catch((error) => {
-        console.error("There was an error updating the value!", error);
-      });
+  const onClick = (e) => {
+    console.log("clicked", e.target.id);
+    setFunctionSpecPopover({
+      opener: e.target.id,
+      open: true,
+    });
   };
+
   return (
     <Card className={`notes ${isSubmitted ? "submitted" : ""}`}>
       <section
@@ -62,14 +30,23 @@ function NotesCard({ isSubmitted }) {
           gap: "0.5rem",
         }}
       >
-        <TextArea
-          value={textArea}
-          id="notes"
-          style={{ height: "100%" }}
-          onInput={(e) => {
-            setTextArea(e.target.value);
+        <List headerText="Function Specs" style={{ height: "100%" }}>
+          <ListItemStandard id="create service contract" onClick={onClick}>
+            Create a service contract
+          </ListItemStandard>
+          <ListItemStandard id="list all service contracts" onClick={onClick}>
+            List all service contracts
+          </ListItemStandard>
+        </List>
+        <FunctionSpec
+          open={functionSpecPopover.open}
+          opener={functionSpecPopover.opener}
+          onClose={() => {
+            setFunctionSpecPopover({
+              open: false,
+            });
           }}
-        ></TextArea>
+        ></FunctionSpec>
       </section>
       <div
         style={{
@@ -79,10 +56,11 @@ function NotesCard({ isSubmitted }) {
           gap: "0.25rem",
           padding: "0 0.75rem 0.75rem 0.75rem",
         }}
-      >
-        <Button onClick={onSend}>update</Button>
-      </div>
+      ></div>
     </Card>
+
+    // <Card className={`notes ${isSubmitted ? "submitted" : ""}`}>
+    // </Card>
   );
 }
 

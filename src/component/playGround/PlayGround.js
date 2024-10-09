@@ -9,8 +9,11 @@ import {
   Label,
   ObjectPageSection,
   ObjectPage,
-  FlexBox,
-  FlexibleColumnLayout,
+  Table,
+  TableHeaderCell,
+  TableHeaderRow,
+  TableCell,
+  TableRow,
 } from "@ui5/webcomponents-react";
 import "../css/InputExplosion.css";
 
@@ -19,37 +22,84 @@ function PlayGround({ isSubmitted }) {
 
   const [exploded, setExploded] = useState(true);
 
-  const renderedLayout = Object.keys(layout).map((key) => {
-    console.log("key is", key, "lay out is", layout[key]);
-    let fields = layout[key].map((field, index) => {
-      let fieldName = Object.keys(field)[0];
+  let renderedLayout;
 
-      return (
-        <FormItem
-          key={fieldName}
-          labelContent={
-            <Label
+  if (layout["Type"] === "A") {
+    renderedLayout = Object.keys(layout).map((key) => {
+      if (key === "Type") {
+        return;
+      }
+
+      let fields = layout[key].map((field, index) => {
+        let fieldName = Object.keys(field)[0];
+        return (
+          <FormItem
+            key={fieldName}
+            labelContent={
+              <Label
+                className="exploded-input"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {fieldName}
+              </Label>
+            }
+          >
+            <BasicInput
+              key={fieldName + "input"}
+              type="Text"
+              valueState="None"
+              value={field[fieldName]}
               className="exploded-input"
               style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {fieldName}
-            </Label>
-          }
-        >
-          <BasicInput
-            type="Text"
-            valueState="None"
-            value={field[fieldName]}
-            className="exploded-input"
-            style={{ animationDelay: `${index * 0.1}s` }}
-          />
-        </FormItem>
+            />
+          </FormItem>
+        );
+      });
+
+      console.log("return arrived");
+      // return <FormGroup headerText={layout[key]}>{fields}</FormGroup>;
+      return <FormGroup headerText={key}>{fields}</FormGroup>;
+    });
+    renderedLayout = (
+      <Form
+        headerText="ERP Canvas"
+        labelSpan="S12 M6 L6 XL6"
+        layout="S2 M2 L3 XL3"
+      >
+        {renderedLayout}
+      </Form>
+    );
+  } else if (layout["Type"] === "B") {
+    let tableHeaderRow = layout["fieldname"].map((field) => {
+      return (
+        <TableHeaderCell key={field} minWidth="12rem">
+          <span>{field}</span>
+        </TableHeaderCell>
       );
     });
 
-    // return <FormGroup headerText={layout[key]}>{fields}</FormGroup>;
-    return <FormGroup headerText={key}>{fields}</FormGroup>;
-  });
+    tableHeaderRow = <TableHeaderRow sticky>{tableHeaderRow}</TableHeaderRow>;
+
+    let tableRows = layout["value"].map((row) => {
+      return (
+        <TableRow>
+          {row.map((value) => {
+            return (
+              <TableCell>
+                <span>{value}</span>
+              </TableCell>
+            );
+          })}
+        </TableRow>
+      );
+    });
+
+    renderedLayout = (
+      <Table headerRow={tableHeaderRow} onRowClick={function ks() {}}>
+        {tableRows}
+      </Table>
+    );
+  }
 
   return (
     <div className={`new-page ${isSubmitted ? "visible" : ""}`}>
@@ -61,13 +111,7 @@ function PlayGround({ isSubmitted }) {
               id="Details"
               titleText="Details"
             >
-              <Form
-                headerText="ERP Canvas"
-                labelSpan="S12 M6 L6 XL6"
-                layout="S2 M2 L3 XL3"
-              >
-                {renderedLayout}
-              </Form>
+              {renderedLayout}
             </ObjectPageSection>
           </ObjectPage>
         )}
