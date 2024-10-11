@@ -1,0 +1,57 @@
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 400px;
+  height: 400px;
+  width: 100%;
+  overflow: auto;
+  padding: 20px;
+}
+
+.chatBox__messages {
+  flex: 1;
+  overflow: auto;
+}
+
+.chatBox__input {
+  display: flex;
+  border-top: 1px solid #ccc;
+  padding: 10px;
+}
+
+.chatBox__input input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+}
+
+.chatBox__input button {
+  background: #007bff;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.user {
+  align-self: flex-end;
+  background: #007bff;
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px;
+  word-wrap: break-word;
+}
+
+.other {
+  align-self: flex-start;
+  background: #eee;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px;
+  word-wrap: break-word;
+}
