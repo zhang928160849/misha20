@@ -24,13 +24,19 @@ function PlayGround({ isSubmitted }) {
 
   let renderedLayout;
 
-  if (layout["Type"] === "A") {
-    renderedLayout = Object.keys(layout).map((key) => {
+  let layoutInfo;
+
+  if (layout) {
+    layoutInfo = layout["layout"];
+  }
+
+  if (layoutInfo && layoutInfo["Type"] === "A") {
+    renderedLayout = Object.keys(layoutInfo).map((key) => {
       if (key === "Type") {
         return;
       }
 
-      let fields = layout[key].map((field, index) => {
+      let fields = layoutInfo[key].map((field, index) => {
         let fieldName = Object.keys(field)[0];
         return (
           <FormItem
@@ -69,8 +75,8 @@ function PlayGround({ isSubmitted }) {
         {renderedLayout}
       </Form>
     );
-  } else if (layout["Type"] === "B") {
-    let tableHeaderRow = layout["fieldname"].map((field) => {
+  } else if (layoutInfo && layoutInfo["Type"] === "B") {
+    let tableHeaderRow = layoutInfo["fieldname"].map((field) => {
       return (
         <TableHeaderCell key={field} minWidth="12rem">
           <span>{field}</span>
@@ -80,7 +86,7 @@ function PlayGround({ isSubmitted }) {
 
     tableHeaderRow = <TableHeaderRow sticky>{tableHeaderRow}</TableHeaderRow>;
 
-    let tableRows = layout["value"].map((row) => {
+    let tableRows = layoutInfo["value"].map((row) => {
       return (
         <TableRow>
           {row.map((value) => {

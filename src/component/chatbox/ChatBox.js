@@ -8,7 +8,7 @@ import { LayoutContext } from "../context/LayoutContext";
 const ChatBox = ({ isSubmitted, onSubmit }) => {
   const [messages, setMessages] = useState([]);
   const [textArea, setTextArea] = useState("");
-  const { setLayout } = React.useContext(LayoutContext);
+  const { layout, setLayout } = React.useContext(LayoutContext);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -23,14 +23,39 @@ const ChatBox = ({ isSubmitted, onSubmit }) => {
     setTextArea("");
     onSubmit();
 
-    const postData = {
-      messages: [
-        {
-          role: "user",
-          content: textArea,
-        },
-      ],
-      model: "gpt-4o",
+    const postData = () => {
+      let chatHistory = messages.map((message) => {
+        switch (message.sender) {
+          case "user":
+            return {
+              role: "user",
+              content: message.text,
+            };
+          case "other":
+            return {
+              role: "assistant",
+              content: JSON.stringify({
+                message: message.text,
+                layout: message.layout,
+              }),
+            };
+          default:
+            break;
+        }
+      });
+
+      console.log("chat history is", chatHistory);
+
+      return {
+        messages: [
+          ...chatHistory,
+          {
+            role: "user",
+            content: textArea,
+          },
+        ],
+        model: "gpt-4o",
+      };
     };
 
     try {
@@ -39,7 +64,7 @@ const ChatBox = ({ isSubmitted, onSubmit }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(postData),
+        body: JSON.stringify(postData()),
       });
 
       if (!response.ok) {
@@ -47,9 +72,18 @@ const ChatBox = ({ isSubmitted, onSubmit }) => {
       }
 
       let jsonRes = await response.json();
-      console.log(jsonRes["message"]);
 
       setLayout(JSON.parse(jsonRes["message"]));
+      setMessages((prevState) => {
+        return [
+          ...prevState,
+          {
+            text: JSON.parse(jsonRes["message"]).message,
+            sender: "other",
+            layout: JSON.parse(jsonRes["message"]).layout,
+          },
+        ];
+      });
     } catch (error) {
       console.log(error);
     }
