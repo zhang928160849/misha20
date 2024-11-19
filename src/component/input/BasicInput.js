@@ -1,6 +1,6 @@
 import { Input } from "@ui5/webcomponents-react";
 
-function BasicInput({ type, value, onChange, className, style }) {
+function BasicInput({ type, value, onChange, className, style, valueState }) {
   return (
     <Input
       type={type}
@@ -8,6 +8,7 @@ function BasicInput({ type, value, onChange, className, style }) {
       onChange={onChange}
       className={className}
       style={style}
+      valueState={valueState}
     />
   );
 }

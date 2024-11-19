@@ -32,9 +32,7 @@ function PlayGround({ isSubmitted }) {
 
   if (layoutInfo && layoutInfo["Type"] === "A") {
     renderedLayout = Object.keys(layoutInfo).map((key) => {
-      if (key === "Type") {
-        return;
-      }
+      if (key === "Type") return;
 
       let fields = layoutInfo[key].map((field, index) => {
         let fieldName = Object.keys(field)[0];
@@ -53,10 +51,10 @@ function PlayGround({ isSubmitted }) {
             <BasicInput
               key={fieldName + "input"}
               type="Text"
-              valueState="None"
               value={field[fieldName]}
               className="exploded-input"
               style={{ animationDelay: `${index * 0.1}s` }}
+              valueState="None"
             />
           </FormItem>
         );
@@ -119,6 +117,13 @@ function PlayGround({ isSubmitted }) {
             >
               {renderedLayout}
             </ObjectPageSection>
+            {/* <ObjectPageSection aria-label="Details" id="Details1">
+              <Form
+                headerText="ERP Canvas 11"
+                labelSpan="S12 M6 L6 XL6"
+                layout="S2 M2 L3 XL3"
+              ></Form>
+            </ObjectPageSection> */}
           </ObjectPage>
         )}
       </div>
