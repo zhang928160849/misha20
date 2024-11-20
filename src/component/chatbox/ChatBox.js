@@ -54,7 +54,7 @@ const ChatBox = ({ isSubmitted, onSubmit }) => {
             content: textArea,
           },
         ],
-        model: "gpt-4o",
+        model: "gpt-4o-2024-08-06",
       };
     };
 
@@ -78,7 +78,7 @@ const ChatBox = ({ isSubmitted, onSubmit }) => {
         return [
           ...prevState,
           {
-            text: JSON.parse(jsonRes["message"]).message,
+            text: JSON.parse(jsonRes["message"]).answer,
             sender: "other",
             layout: JSON.parse(jsonRes["message"]).layout,
           },

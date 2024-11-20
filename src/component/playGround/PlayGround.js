@@ -1,6 +1,7 @@
 import "../css/PlayGround.css";
 import { LayoutContext } from "../context/LayoutContext";
 import { useState, useContext } from "react";
+import logJsxDetails from "../devUtil/devUtils";
 import BasicInput from "../input/BasicInput";
 import {
   Form,
@@ -9,11 +10,11 @@ import {
   Label,
   ObjectPageSection,
   ObjectPage,
-  Table,
-  TableHeaderCell,
-  TableHeaderRow,
-  TableCell,
-  TableRow,
+  Input,
+  Select,
+  Option,
+  TextArea,
+  CheckBox,
 } from "@ui5/webcomponents-react";
 import "../css/InputExplosion.css";
 
@@ -30,80 +31,61 @@ function PlayGround({ isSubmitted }) {
     layoutInfo = layout["layout"];
   }
 
-  if (layoutInfo && layoutInfo["Type"] === "A") {
-    renderedLayout = Object.keys(layoutInfo).map((key) => {
-      if (key === "Type") return;
+  const mapJsonToJsx = (json) => {
+    const { type, label, children, attributes } = json;
 
-      let fields = layoutInfo[key].map((field, index) => {
-        let fieldName = Object.keys(field)[0];
+    const buildAttributes = (attributesArray) => {
+      const attributes = {};
+      attributesArray?.forEach((attr) => (attributes[attr.name] = attr.value));
+      return attributes;
+    };
+
+    switch (type) {
+      case "Form":
+        return (
+          <Form {...buildAttributes(attributes)}>
+            {label && <h1>{label}</h1>}
+            {children && children.map(mapJsonToJsx)}
+          </Form>
+        );
+      case "FormGroup":
+        return (
+          <FormGroup headerText={label} {...buildAttributes(attributes)}>
+            {children && children.map(mapJsonToJsx)}
+          </FormGroup>
+        );
+      case "FormItem":
         return (
           <FormItem
-            key={fieldName}
-            labelContent={
-              <Label
-                className="exploded-input"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                {fieldName}
-              </Label>
-            }
+            labelContent={<Label>{label}</Label>}
+            {...buildAttributes(attributes)}
           >
-            <BasicInput
-              key={fieldName + "input"}
-              type="Text"
-              value={field[fieldName]}
-              className="exploded-input"
-              style={{ animationDelay: `${index * 0.1}s` }}
-              valueState="None"
-            />
+            {children && children.map(mapJsonToJsx)}
           </FormItem>
         );
-      });
+      case "Input":
+        return <Input {...buildAttributes(attributes)} />;
+      case "Select":
+        return (
+          <Select {...buildAttributes(attributes)}>
+            {children && children.map(mapJsonToJsx)}
+          </Select>
+        );
+      case "Option":
+        return <Option {...buildAttributes(attributes)}>{label}</Option>;
+      default:
+        return null;
+    }
+  };
 
-      console.log("return arrived");
-      // return <FormGroup headerText={layout[key]}>{fields}</FormGroup>;
-      return <FormGroup headerText={key}>{fields}</FormGroup>;
-    });
-    renderedLayout = (
-      <Form
-        headerText="ERP Canvas"
-        labelSpan="S12 M6 L6 XL6"
-        layout="S2 M2 L3 XL3"
-      >
-        {renderedLayout}
-      </Form>
-    );
-  } else if (layoutInfo && layoutInfo["Type"] === "B") {
-    let tableHeaderRow = layoutInfo["fieldname"].map((field) => {
-      return (
-        <TableHeaderCell key={field} minWidth="12rem">
-          <span>{field}</span>
-        </TableHeaderCell>
-      );
-    });
-
-    tableHeaderRow = <TableHeaderRow sticky>{tableHeaderRow}</TableHeaderRow>;
-
-    let tableRows = layoutInfo["value"].map((row) => {
-      return (
-        <TableRow>
-          {row.map((value) => {
-            return (
-              <TableCell>
-                <span>{value}</span>
-              </TableCell>
-            );
-          })}
-        </TableRow>
-      );
-    });
-
-    renderedLayout = (
-      <Table headerRow={tableHeaderRow} onRowClick={function ks() {}}>
-        {tableRows}
-      </Table>
-    );
-  }
+  const dynamicForm = () => {
+    if (layoutInfo) {
+      let form = mapJsonToJsx(layoutInfo);
+      logJsxDetails(form);
+      return form;
+    }
+    return null;
+  };
 
   return (
     <div className={`new-page ${isSubmitted ? "visible" : ""}`}>
@@ -115,15 +97,8 @@ function PlayGround({ isSubmitted }) {
               id="Details"
               titleText="Details"
             >
-              {renderedLayout}
+              {dynamicForm()}
             </ObjectPageSection>
-            {/* <ObjectPageSection aria-label="Details" id="Details1">
-              <Form
-                headerText="ERP Canvas 11"
-                labelSpan="S12 M6 L6 XL6"
-                layout="S2 M2 L3 XL3"
-              ></Form>
-            </ObjectPageSection> */}
           </ObjectPage>
         )}
       </div>
