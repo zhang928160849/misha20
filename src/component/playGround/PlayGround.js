@@ -31,6 +31,52 @@ function PlayGround({ isSubmitted }) {
     layoutInfo = layout["layout"];
   }
 
+  const mapJsonToHtml = (json) => {
+    const { type, label, children, attributes } = json;
+
+    const buildAttributes = (attributesArray) => {
+      return (
+        attributesArray
+          ?.map((attr) => `${attr.name}="${attr.value}"`)
+          .join(" ") || ""
+      );
+    };
+
+    switch (type) {
+      case "Form":
+        return `
+          <form ${buildAttributes(attributes)}>
+            ${label ? `<h1>${label}</h1>` : ""}
+            ${children ? children.map(mapJsonToHtml).join("") : ""}
+          </form>
+        `;
+      case "FormGroup":
+        return `
+          <FormGroup class="form-group" ${buildAttributes(attributes)}>
+              ${children ? children.map(mapJsonToHtml).join("") : ""}
+          </FormGroup>
+        `;
+      case "FormItem":
+        return `
+          <FormItem class="form-item" ${buildAttributes(attributes)}>
+            ${children ? children.map(mapJsonToHtml).join("") : ""}
+          </FormItem>
+        `;
+      case "Input":
+        return `<Input ${buildAttributes(attributes)} />`;
+      case "Select":
+        return `
+          <Select ${buildAttributes(attributes)}>
+            ${children ? children.map(mapJsonToHtml).join("") : ""}
+          </Select>
+        `;
+      case "Option":
+        return `<Option ${buildAttributes(attributes)}>${label}</option>`;
+      default:
+        return "";
+    }
+  };
+
   const mapJsonToJsx = (json) => {
     const { type, label, children, attributes } = json;
 
@@ -44,7 +90,7 @@ function PlayGround({ isSubmitted }) {
       case "Form":
         return (
           <Form {...buildAttributes(attributes)}>
-            {label && <h1>{label}</h1>}
+            {/* {label && <h1>{label}</h1>} */}
             {children && children.map(mapJsonToJsx)}
           </Form>
         );
@@ -81,7 +127,8 @@ function PlayGround({ isSubmitted }) {
   const dynamicForm = () => {
     if (layoutInfo) {
       let form = mapJsonToJsx(layoutInfo);
-      logJsxDetails(form);
+      let formtring = mapJsonToHtml(layoutInfo);
+
       return form;
     }
     return null;
