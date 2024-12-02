@@ -125,13 +125,11 @@ function PlayGround({ isSubmitted }) {
   };
 
   const dynamicForm = () => {
-    if (layoutInfo) {
-      let form = mapJsonToJsx(layoutInfo);
-      let formtring = mapJsonToHtml(layoutInfo);
-
-      return form;
+    if (!layoutInfo) {
+      return null;
     }
-    return null;
+    let formGroups = layoutInfo.map(mapJsonToJsx);
+    return formGroups;
   };
 
   return (
@@ -144,7 +142,7 @@ function PlayGround({ isSubmitted }) {
               id="Details"
               titleText="Details"
             >
-              {dynamicForm()}
+              <Form>{dynamicForm()}</Form>
             </ObjectPageSection>
           </ObjectPage>
         )}
